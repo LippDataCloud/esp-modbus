@@ -93,6 +93,7 @@ typedef struct {
     mb_parameter_opt_t  param_opts;         /*!< Parameter options used to check limits and etc. */
     mb_param_perms_t    access;             /*!< Access permissions based on mode */
     bool                bigendian;          /*!< Set to true if register is 32-bit big-endian */
+    bool                reg_bigendian;      /*!< Set to true if bytes in 16-bit words are big-endian */
 } mb_parameter_descriptor_t;
 
 /**
