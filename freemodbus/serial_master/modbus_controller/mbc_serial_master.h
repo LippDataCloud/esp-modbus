@@ -15,6 +15,15 @@
 #include "esp_err.h"                // for esp_err_t
 #include "esp_modbus_common.h"      // for common defines
 
+/* Add-on to fix endianness issues */
+// BigEndian 32bit swap
+//   just swap the two 16 bit registers since the two bytes in each
+//   register are already swapped (BigEndian) as per modbus standard.
+#define __beswap_32(x) \
+    (__extension__({ uint32_t __bsx = (x);					      \
+        ((((__bsx) >> 16) & 0xffff) | (((__bsx) & 0xffff) << 16)); }))
+
+
 /**
  * @brief Initialize Modbus controller and stack
  *

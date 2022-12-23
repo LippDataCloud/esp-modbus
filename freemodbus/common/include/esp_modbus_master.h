@@ -92,6 +92,7 @@ typedef struct {
     mb_descr_size_t     param_size;         /*!< Number of bytes in the parameter. */
     mb_parameter_opt_t  param_opts;         /*!< Parameter options used to check limits and etc. */
     mb_param_perms_t    access;             /*!< Access permissions based on mode */
+    bool                bigendian;          /*!< Set to true if register is 32-bit big-endian */
 } mb_parameter_descriptor_t;
 
 /**

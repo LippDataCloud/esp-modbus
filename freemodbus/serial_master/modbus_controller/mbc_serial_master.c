@@ -401,6 +401,14 @@ static esp_err_t mbc_serial_master_get_parameter(uint16_t cid, char* name,
         }
         // Set the type of parameter found in the table
         *type = reg_info.param_type;
+        
+        /* Modify data endianness as described here https://www.esp32.com/viewtopic.php?t=23040 */
+        if (((reg_info.param_type == PARAM_TYPE_FLOAT) || (reg_info.param_type == PARAM_TYPE_U32)) 
+        && (reg_info.param_size == 4) && (reg_info.bigendian == true)) 
+        {
+            // Fix endianess for FLOAT and U32 parameter here <<<<<<<<<<<<<<<<<<<
+            *(uint32_t*)value_ptr = __beswap_32(*(uint32_t*)value_ptr);
+        }
     } else {
         ESP_LOGE(TAG, "%s: The cid(%u) not found in the data dictionary.",
                                                     __FUNCTION__, reg_info.cid);
