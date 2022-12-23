@@ -94,6 +94,8 @@ typedef struct {
     mb_param_perms_t    access;             /*!< Access permissions based on mode */
     bool                bigendian;          /*!< Set to true if register is 32-bit big-endian */
     bool                reg_bigendian;      /*!< Set to true if bytes in 16-bit words are big-endian */
+    double              scale;              /*!< Multiplier */
+    bool                is_attribute;       /*!< Set to true if value is attribute */
 } mb_parameter_descriptor_t;
 
 /**
