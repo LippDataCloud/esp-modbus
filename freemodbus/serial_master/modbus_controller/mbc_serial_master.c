@@ -376,6 +376,26 @@ static esp_err_t mbc_serial_master_set_request(char* name, mb_param_mode_t mode,
     return error;
 }
 
+static inline uint32_t wordswap_uint32(uint32_t number)
+{
+    return (((number >> 16) & 0xFFFF) |
+            ((number & 0xFFFF) << 16));
+}
+
+static inline uint32_t byteswap_uint32(uint32_t value)
+{
+    return (((value & 0xFF000000) >> 8) |
+            ((value & 0x00FF0000) << 8) |
+            ((value & 0x0000FF00) >> 8) |
+            ((value & 0x000000FF) << 8));
+}
+
+static inline uint16_t byteswap_uint16(uint16_t value)
+{
+    return (((value & 0x00FF) << 8) |
+            ((value & 0xFF00) >> 8));
+}
+
 // Get parameter data for corresponding characteristic
 static esp_err_t mbc_serial_master_get_parameter(uint16_t cid, char* name,
                                                     uint8_t* value_ptr, uint8_t *type)
@@ -401,6 +421,28 @@ static esp_err_t mbc_serial_master_get_parameter(uint16_t cid, char* name,
         }
         // Set the type of parameter found in the table
         *type = reg_info.param_type;
+
+        /* Byte-swap words */
+        if (((reg_info.param_type == PARAM_TYPE_U16)) && (reg_info.param_size == 2) && (reg_info.reg_bigendian == false))
+        {
+            *(uint32_t *)value_ptr = byteswap_uint32(*(uint32_t *)value_ptr);
+        }
+
+        /* Modify 32-bit data word order */
+        if (((reg_info.param_type == PARAM_TYPE_FLOAT) || (reg_info.param_type == PARAM_TYPE_U32)) && (reg_info.param_size == 4))
+        {
+            if ((reg_info.bigendian == true))
+            {
+                /* Change word order */
+                *(uint32_t *)value_ptr = wordswap_uint32(*(uint32_t *)value_ptr);
+            }
+
+            /* Change byte order of words, if needed */
+            if (reg_info.reg_bigendian == false)
+            {
+                *(uint32_t *)value_ptr = byteswap_uint32(*(uint32_t *)value_ptr);
+            }
+        }
     } else {
         ESP_LOGE(TAG, "%s: The cid(%u) not found in the data dictionary.",
                                                     __FUNCTION__, reg_info.cid);
